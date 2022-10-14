@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { DataTable } from "@shopify/polaris";
+import React, { useState } from "react";
+import { Card, DataTable } from "@shopify/polaris";
 import axios from "axios";
 
 /** @type { import("axios").AxiosInstance } */
@@ -18,9 +18,18 @@ async function getDataFromPIM() {
 
 export function ProductList() {
   const [isLoading, setIsLoading] = useState(true);
-  const [rows, setRows] = useState([["ID", "Name", "Description", "Oject Type"]]);
+  const [rows, setRows] = useState([]);
 
   getDataFromPIM()
+    .then(({ "hydra:member": hydraMember }) => {
+      const computedRows = hydraMember.map((item) => [
+        item.id,
+        item.name,
+        item.description,
+        item.objectType,
+      ]);
+      setRows(computedRows);
+    })
     .then(() => {
       setIsLoading(false);
     });
@@ -35,6 +44,7 @@ export function ProductList() {
             columnContentTypes={["text", "text", "text", "text"]}
             headings={["ID", "Name", "Description", "Oject Type"]}
             rows={rows}
+            totals={[]} 
           />
         </Card>
       )}
